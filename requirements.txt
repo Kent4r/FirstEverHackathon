@@ -1,0 +1,8 @@
+Python 3.9+
+Последняя версия pip
+
+Библиотеки:
+pip install regex
+pip install pandas
+pip install numpy
+pip install DateTime
