@@ -6,7 +6,7 @@ from datetime import datetime
 # %%
 
 df = pd.read_csv('ds_dirty_fin_202410041147.csv')
-# %%
+# %% Функции
 
 def split_fio(full_fio):
     if re.search(r'[0-9]', full_fio):
@@ -64,9 +64,17 @@ df['client_bday'] = df['client_bday'].apply(change_date)
 fio_parts = df['client_fio_full'].value_counts().index.tolist()
 fio_parts = [process_fio(fio) for fio in fio_parts]
 
-surname_list = [part[0] for part in fio_parts]
-name_list = [part[1] for part in fio_parts]
-patronymic_list = [part[2] for part in fio_parts]
+surname_list = []
+name_list = []
+patronymic_list = []
+for part in fio_parts:
+    surname_list.append(part[0])
+    name_list.append(part[1])
+    patronymic_list.append(part[2])
+
+# surname_list = [part[0] for part in fio_parts]
+# name_list = [part[1] for part in fio_parts]
+# patronymic_list = [part[2] for part in fio_parts]
 
 full_fio_list = [f"{surname} {name} {patronymic}".upper() for surname, name, patronymic in zip(surname_list, name_list, patronymic_list)]
 # %%
