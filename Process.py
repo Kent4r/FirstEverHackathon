@@ -54,7 +54,7 @@ def change_date(x):
     '''
     try:
         date = (datetime.now() - datetime.strptime(x, "%Y-%m-%d")).days
-        if 14*365 <= date <= 100*365:
+        if 1 <= date <= 100*365:
             return x
         else:
             return np.nan
@@ -232,14 +232,44 @@ for column in needed_columns:
 
 # %%
 
+df.head()
+
+# %%
+
+# %%
 # Merge client strings into one in dataframe golden_df
+
+# Сортировка по дате последнего изменения
 df_res = df_res.sort_values(by='update_date', ascending=False)
 
-golden_df = df_res.groupby('client_fio_full').first().reset_index()
+# Группировка по ФИО и дате рождения
+grouped_df = df_res.groupby(['client_fio_full', 'client_bday']).first().reset_index()
 
+# Создание копии для объединения строк
+golden_df = grouped_df.copy()
+
+# Объединение строк по столбцам
 for col in tqdm(df_res.columns, desc="Merging strings by columns"):
-    if col != 'client_fio_full':
-        golden_df[col] = golden_df[col].combine_first(df.groupby('client_fio_full')[col].last())
+    if col not in ['client_fio_full', 'client_bday']:
+        # Группировка по ФИО и дате рождения для каждого столбца
+        last_values = df_res.groupby(['client_fio_full', 'client_bday'])[col].last().reset_index()
+        # Объединение с golden_df
+        golden_df = golden_df.merge(last_values, on=['client_fio_full', 'client_bday'], how='left', suffixes=('', '_last'))
+        # Обновление значений в golden_df
+        golden_df[col] = golden_df[col].combine_first(golden_df[col + '_last'])
+        # Удаление временного столбца
+        golden_df.drop(columns=[col + '_last'], inplace=True)
+
+# Удаление дублирующихся столбцов, если они есть
+golden_df = golden_df.loc[:, ~golden_df.columns.duplicated()]
+# %%
+
+golden_df['client_fio_full'] = golden_df.apply(
+    lambda row: ' '.join([row['client_last_name'], row['client_first_name'], row['client_middle_name']]).upper()
+    if row['client_fio_full'] == 'НАН НАН НАН'
+    else row['client_fio_full'],
+    axis=1
+)
 # %%
 # Saving data
 print('The merger is complete!')
@@ -252,4 +282,4 @@ print('File saved in: golden_df.csv\n')
 end_time = time.time()
 elapsed_time = round(end_time-start_time, 2)
 print(f'Code execution time: {elapsed_time}s ({elapsed_time/60}min)')
-
+# %%
