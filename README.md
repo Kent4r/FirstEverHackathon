@@ -37,6 +37,8 @@
 ## Ссылки
 
 Презентация - либо Презентация.pptx, либо https://disk.yandex.ru/i/Sdsu0CrQ3H9AFA
-Видео демки - в папке на гугл диске https://drive.google.com/drive/folders/1aG69s-3ErsinGAZlTMqFchZcRqH5bmEz?usp=sharing
+
+Видео демки - в папке на гугл диске https://drive.google.com/drive/folders/1aG69s-3ErsinGAZlTMqFchZcRqH5bmEz?usp=sharing 
 Текущая версия демо - v0.2
+
 Выходной CSV файл либо здешний golden_df.csv, либо при наличии на гугл диске по ссылке выше
