@@ -151,7 +151,7 @@ df['client_inn'] = df['client_inn'].apply(
 )
 # %%
 # Change the values in the client's SNILS to str
-df['client_snils'] = df['client_inn'].apply(
+df['client_snils'] = df['client_snils'].apply(
     lambda x: str(x)[:-2] if not pd.isna(x) else x
 )
 #%%
