@@ -1,4 +1,5 @@
-#%% IMPORTS
+#%%
+# IMPORTS
 import pandas as pd
 import numpy as np
 import re
@@ -8,13 +9,19 @@ from tqdm import tqdm
 # from transliterate import translit
 # /stopwatch for code/
 start_time = time.time()
+
 # %%
+# Set max display
 pd.set_option('display.max_column', None)
+
 # %%
+# Begin dataset download
 print('Beginning dataset download...')
 df = pd.read_csv('ds_dirty_fin_202410041147.csv')      # <========== Put path to ur df here
 print(f'Dataset has been successfully uploaded. Size:{df.shape} \nTime: {round(time.time()-start_time,2)}s\n\n')
-# %% FUNCS
+
+# %%
+# FUNCS
 def split_fio(full_fio: str) -> list:
     '''
     Takes a string of full name, and breaks it down into a name,\n
@@ -111,12 +118,15 @@ def procces_data(df_full_fio: list, name_index: int) -> list:
     return value_list
 
 # %%
+# Set timer for cleaning
 print('Reworking and cleaning...')
 clean_st_time = time.time()
+
 # %%
 # Change all skips to NaN
 df = df.replace(r'^\s*$', np.nan, regex=True)
 df = df.replace('', np.nan)
+
 # %%
 # Sorting columns by number of non-zero values
 sorted_columns = df.notna().sum().sort_values(ascending=False).index
@@ -169,12 +179,14 @@ full_fio_list = [f"{surname} {name} {patronymic}".upper() for surname, name, pat
 df_res = df.copy()
 
 # %%
+# Truly dunno
 fio_dict = dict(zip(df['client_fio_full'].value_counts().index.tolist(), full_fio_list))
 names_dict = dict(zip(full_fio_list, name_list))
 surnames_dict = dict(zip(full_fio_list, surname_list))
 patronymics_dict = dict(zip(full_fio_list, patronymic_list))
 
 # %%
+# End of cleaning
 df_res['client_fio_full'] = df_res['client_fio_full'].apply(replace_fio)
 df_res['client_first_name'] = df_res['client_first_name'].apply(replace_name)
 df_res['client_last_name'] = df_res['client_last_name'].apply(replace_surname)
@@ -183,8 +195,8 @@ df_res['client_middle_name'] = df_res['client_middle_name'].apply(replace_patron
 print(f'Cleanin` is complete.\nTime: {round(time.time() - clean_st_time, 2)}s\n\n')
 
 # %%
-# Переводим транслит
-# Словарь для перевода транслита на кириллицу
+# Remove транслит
+# Dictionary for translate
 translit_dict = {
     'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'e': 'е', 'yo': 'ё', 'zh': 'ж', 'z': 'з',
     'i': 'и', 'j': 'й', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о', 'p': 'п', 'r': 'р',
@@ -229,6 +241,7 @@ for col in tqdm(df_res.columns, desc="Merging strings by columns"):
     if col != 'client_fio_full':
         golden_df[col] = golden_df[col].combine_first(df.groupby('client_fio_full')[col].last())
 # %%
+# Saving data
 print('The merger is complete!')
 golden_df.to_csv('golden_df.csv')
 print(f'Shape: {golden_df.shape}')
