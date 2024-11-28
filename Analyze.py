@@ -25,3 +25,7 @@ df['client_child_cnt'].value_counts()
 df['source_cd'].value_counts()
 # %%
 df['update_date'].value_counts().index.tolist()
+# %%
+df[df['client_cityzen']=='Д']
+
+# %%
